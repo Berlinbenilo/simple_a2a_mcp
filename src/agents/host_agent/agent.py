@@ -16,6 +16,7 @@ from rich.syntax import Syntax
 
 from src.services.agent_connector import AgentConnector
 from src.services.agent_discovery import AgentDiscovery
+from src.services.mcp_connector import MCPConnector
 
 load_dotenv()
 
@@ -38,6 +39,7 @@ class HostAgent:
         self.system_instruction = self.SYSTEM_INSTRUCTION
         self.description = self.DESCRIPTION
         self.AgentDiscovery = AgentDiscovery()
+        self.MCPConnector = MCPConnector()
 
         self._agent = None
         self._user_id = "host_agent_user"
@@ -83,6 +85,8 @@ class HostAgent:
         return await connector.send_task(message=message, session_id=str(uuid4()))
 
     async def _build_agent(self) -> LlmAgent:
+
+        mcp_tools = self.MCPConnector.get_tools()
         return LlmAgent(
             name="host_agent",
             model="gemini-2.5-flash",
@@ -90,7 +94,8 @@ class HostAgent:
             description=self.description,
             tools=[
                 FunctionTool(self._delegate_task),
-                FunctionTool(self._list_agents)
+                FunctionTool(self._list_agents),
+                *mcp_tools
             ]
         )
 

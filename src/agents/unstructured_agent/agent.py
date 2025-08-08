@@ -40,6 +40,8 @@ class ResponseFormat(BaseModel):
 
 
 class UnstructuredAgent:
+    """UnstructuredAgent is a LangGraph agent that uses Google Generative AI to answer questions about a user's
+    resume and personal information."""
     SYSTEM_INSTRUCTION = """You are an assistant that help user to answer about personal information that prvided in 
     there resume. You can use "vector_search" tool to search for relevant information in the vector database.
     If user ask anything other than resume related information, asnwer with "I am not sure about that, please" \
@@ -59,6 +61,19 @@ class UnstructuredAgent:
         )
 
     async def invoke(self, query: str, session_id: str):
+        """ Invoke the agent with a query and session ID.
+        Args:
+            query (str): The user's query.
+            session_id (str): The session ID for tracking the conversation.
+        Yields:
+            Return a stream of updates back to the caller as the agent processes the query
+
+        {
+            'is_task_complete': bool,  # Indicates if the task is complete
+            'updates': str,  # Updates on the task progress
+            'content': str  # Final result of the task if complete
+        }
+        """
         config = {"configurable": {"thread_id": session_id}}
         await self.graph.ainvoke({"messages": [("user", query)]}, config)
         current_state = self.graph.get_state(config)

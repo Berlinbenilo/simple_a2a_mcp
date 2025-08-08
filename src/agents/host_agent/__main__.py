@@ -33,8 +33,8 @@ async def main(host: str, port: int):
         description="A simple orchestrator for orchestrating tasks",
         url=f"http://{host}:{port}/",
         version="1.0.0",
-        defaultInputModes=["text"],
-        defaultOutputModes=["text"],
+        default_input_modes=["text"],
+        default_output_modes=["text"],
         skills=[skill],
         capabilities=AgentCapabilities(streaming=True),
     )
